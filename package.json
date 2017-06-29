@@ -1,0 +1,24 @@
+{
+  "name": "git-user-switcher",
+  "version": "0.1.0",
+  "description": "git user switcher",
+  "main": "main.js",
+  "scripts": {
+    "start": "./node_modules/.bin/electron .",
+    "package": "electron-packager ./ --platform=darwin --arch=x64 --out=out --icon=./icon.icns --overwrite"
+  },
+  "repository": "git@github.com:Lacka90/git-user-switcher.git",
+  "author": "Laszlo Csele <laszlo.csele90@gmail.com>",
+  "license": "MIT",
+  "dependencies": {
+    "bootstrap": "^3.3.7",
+    "electron-json-storage": "^3.0.5",
+    "electron-packager": "^8.7.2",
+    "electron-prebuilt": "^1.4.13",
+    "gitconfig": "^2.0.3",
+    "shelljs": "^0.7.8",
+    "uuid": "^3.1.0",
+    "vue": "^2.3.4",
+    "vue-tooltip": "^0.1.0"
+  }
+}

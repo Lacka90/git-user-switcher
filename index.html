@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>Hello World!</title>
+    <script src="node_modules/vue/dist/vue.js"></script>
+    <style>
+      body {
+        background-color: white;
+        font-family: Arial, Helvetica, sans-serif;
+      }
+      .form-container {
+        display: flex;
+        align-items: flex-start;
+        flex-wrap: nowrap;
+        height: 100%;
+      }
+      .form-child {
+        width: 40%;
+      }
+      .form-button {
+        width: 20%;
+      }
+      .child--bottom {
+        align-self: flex-end;
+      }
+
+      .style-4 label {
+        padding-left: 8px;
+      }
+
+      .style-4 input[type="text"] {
+        padding: 10px;
+        border: none;
+        border-bottom: solid 2px #c9c9c9;
+        transition: border 0.3s;
+      }
+      .style-4 input[type="text"]:focus,
+      .style-4 input[type="text"].focus {
+        border-bottom: solid 2px #969696;
+      }
+
+      section.flat button {
+        color: #fff;
+        background-color: #6496c8;
+        text-shadow: -1px 1px #417cb8;
+        border: none;
+        font-size: 13px;
+        padding: 10px;
+      }
+
+      section.flat button:hover,
+      section.flat button.hover {
+        background-color: #346392;
+        text-shadow: -1px 1px #27496d;
+      }
+
+      section.flat button:active,
+      section.flat button.active {
+        background-color: #27496d;
+        text-shadow: -1px 1px #193047;
+      }
+
+</style>
+
+  <style>
+    .users-list {
+      list-style-type: none;
+      padding-left: 4px;
+    }
+    .users-list li {
+      padding: 4px;
+      width: 48%;
+      margin-bottom: 8px;
+      float: left;
+    }
+
+    .users-list button {
+      color: #fff;
+      background-color: #6496c8;
+      text-shadow: -1px 1px #417cb8;
+      border: none;
+      font-size: 13px;
+      padding: 10px;
+    }
+
+    .users-list button:hover,
+    .users-list button.hover {
+      background-color: #346392;
+      text-shadow: -1px 1px #27496d;
+    }
+
+    .users-list button:active,
+    .users-list button.active {
+      background-color: #27496d;
+      text-shadow: -1px 1px #193047;
+    }
+    .list-button {
+      width: 20%;
+      float: left;
+    }
+    .list-data {
+      width: 80%;
+      float: left;
+      text-overflow: ellipsis;
+      overflow: hidden;
+    }
+  </style>
+  </head>
+  <body>
+    <h1>Git user switcher</h1>
+    <hr>
+    <div id="app" class="app">
+      <section class="flat">
+        <form v-on:submit.prevent="onSubmit" class="form-container">
+          <div class="form-child style-4">
+              <label for="name">Name</label>
+              <input type="text" v-model="name" id="name" placeholder="user.name">
+          </div>
+          <div class="form-child style-4">
+              <label for="email">Email</label>
+              <input type="text" v-model="email" id="email" placeholder="user.email">
+          </div>
+          <button class="form-button form-button child--bottom">ADD</button>
+        </form>
+      </section>
+
+      <ul class="users-list">
+        <li v-for="user in users">
+          <button class="list-button" v-on:click="onRemove(user.id)">X</button>
+          <div class="list-data" v-on:click="onSelect(user)">
+              <a>{{ user.name }}</a>
+              <a>{{ user.email }}</a>
+          </div>
+        </li>
+      </ul>
+    </div>
+
+    <script>
+      const {ipcRenderer, shell} = require('electron');
+      
+      var app = new Vue({
+        el: '#app',
+        data: {
+          name: '',
+          email: '',
+          users: [],
+          message: 'Hello Vue!'
+        },
+        created: function() {
+          ipcRenderer.on('user-saved', (event, userData) => {
+            this._data.users = userData;
+          });
+
+          ipcRenderer.send('get-users'); 
+        },
+        methods: {
+          onSelect: function(user) {
+            ipcRenderer.send('git-user-selected', user);
+          },
+          onRemove: function(id) {
+            ipcRenderer.send('git-user-remove', id);
+          },
+          onSubmit: function() {
+            if (this._data.name && this._data.email) {
+              ipcRenderer.send('git-user-added', {
+                name: this._data.name,
+                email: this._data.email,
+              });
+              this._data.name = '';
+              this._data.email = '';
+            }
+          }
+        }
+      });
+    </script>  
+  </body>
+</html>
