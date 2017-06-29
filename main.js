@@ -97,6 +97,14 @@ ipcMain.on('show-window', () => {
   showWindow();
 });
 
+ipcMain.on('get-active', (event) => {
+  gitconfig.get({
+    location: 'global'
+  }).then((data) => {
+    event.sender.send('user-active', data.user);
+  })
+});
+
 ipcMain.on('get-users', (event) => {
   storage.get('users', (err, data) => {
     const userData = data && data.users || [];
@@ -111,6 +119,8 @@ ipcMain.on('git-user-selected', (event, user) => {
     'user.email': user.email
   }, {
     location: 'global'
+  }).then(() => {
+    event.sender.send('user-active', user);
   });
 }); 
 

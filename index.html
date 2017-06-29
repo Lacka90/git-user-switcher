@@ -75,6 +75,10 @@
       float: left;
     }
 
+    .users-list li.selected {
+      background-color: lightblue;
+    }
+
     .users-list button {
       color: #fff;
       background-color: #6496c8;
@@ -126,7 +130,7 @@
       </section>
 
       <ul class="users-list">
-        <li v-for="user in users">
+        <li v-for="user in users" v-bind:class="{ selected: isSelected(user) }">
           <button class="list-button" v-on:click="onRemove(user.id)">X</button>
           <div class="list-data" v-on:click="onSelect(user)">
               <a>{{ user.name }}</a>
@@ -145,18 +149,27 @@
           name: '',
           email: '',
           users: [],
-          message: 'Hello Vue!'
+          selected: null,
         },
         created: function() {
+          ipcRenderer.on('user-active', (event, user) => {
+            this.selected = user;
+          });
+
           ipcRenderer.on('user-saved', (event, userData) => {
             this._data.users = userData;
           });
 
-          ipcRenderer.send('get-users'); 
+          ipcRenderer.send('get-users');
+          ipcRenderer.send('get-active');
         },
         methods: {
           onSelect: function(user) {
             ipcRenderer.send('git-user-selected', user);
+          },
+          isSelected: function(user) {
+            if (!this._data.selected) return false;
+            return user.name === this._data.selected.name && user.email === this._data.selected.email;
           },
           onRemove: function(id) {
             ipcRenderer.send('git-user-remove', id);
